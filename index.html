@@ -297,6 +297,98 @@
             margin-bottom: 10px;
         }
 
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #666;
+        }
+
+        .login-error {
+            display: none;
+            background: #fee;
+            color: #c33;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .login-error.active {
+            display: block;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-login:hover {
+            transform: scale(1.02);
+        }
+
+        .demo-accounts {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .demo-accounts strong {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .btn-logout {
+            margin-top: 15px;
+            padding: 10px 25px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
         @media (max-width: 768px) {
             header h1 {
                 font-size: 2em;
@@ -305,93 +397,220 @@
             .spreadsheet-grid {
                 grid-template-columns: 1fr;
             }
+
+            .login-header h1 {
+                font-size: 1.5em;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>📚 Portal Input Nilai Guru</h1>
-            <p>Akses spreadsheet nilai siswa dengan mudah</p>
-        </header>
-
-        <div class="search-box">
-            <input type="text" id="searchInput" placeholder="🔍 Cari berdasarkan kelas, mata pelajaran, atau guru...">
-        </div>
-
-        <div class="spreadsheet-grid" id="spreadsheetGrid">
-            <!-- Cards akan dimuat di sini -->
-        </div>
-
-        <div class="empty-state" id="emptyState" style="display: none;">
-            <svg fill="white" viewBox="0 0 24 24">
-                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-            </svg>
-            <h3>Belum ada spreadsheet</h3>
-            <p>Klik tombol + untuk menambahkan spreadsheet baru</p>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <div class="login-header">
+                <h1>📚 Portal Guru</h1>
+                <p>Silakan login untuk melanjutkan</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="username" required autocomplete="username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" required autocomplete="current-password">
+                </div>
+                <div id="loginError" class="login-error">
+                    Username atau password salah!
+                </div>
+                <button type="submit" class="btn-login">Login</button>
+            </form>
+            <div class="demo-accounts">
+                <strong>Ketentuan Username dan Password :</strong>
+                - Bagi bapak/ibuk guru untuk username dan password pengisian tabel spreadsheet nilai silahkan menghubungi admin sekolah<br>
+                - Apabila ada kendala di dalam pengisian silahkan menghubungi admin
+         
+            </div>
         </div>
     </div>
 
-    <button class="add-button" onclick="openModal()">+</button>
+    <!-- Dashboard -->
+    <div id="dashboard" style="display: none;">
+        <div class="container">
+            <header>
+                <h1>📚 Portal Input Nilai Guru</h1>
+                <p id="welcomeText">Selamat datang</p>
+                <button onclick="logout()" class="btn-logout">Logout</button>
+            </header>
 
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <h2>Tambah Spreadsheet Baru</h2>
-            <form id="addForm">
-                <div class="form-group">
-                    <label>Nama Guru</label>
-                    <input type="text" id="teacherName" required>
-                </div>
-                <div class="form-group">
-                    <label>Mata Pelajaran</label>
-                    <input type="text" id="subject" required>
-                </div>
-                <div class="form-group">
-                    <label>Kelas</label>
-                    <input type="text" id="className" placeholder="Contoh: 7A, 8B" required>
-                </div>
-                <div class="form-group">
-                    <label>Link Spreadsheet</label>
-                    <input type="url" id="spreadsheetUrl" placeholder="https://docs.google.com/spreadsheets/..." required>
-                </div>
-                <div class="modal-buttons">
-                    <button type="button" class="btn-cancel" onclick="closeModal()">Batal</button>
-                    <button type="submit" class="btn-save">Simpan</button>
-                </div>
-            </form>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Cari berdasarkan kelas, mata pelajaran, atau guru...">
+            </div>
+
+            <div class="spreadsheet-grid" id="spreadsheetGrid">
+                <!-- Cards akan dimuat di sini -->
+            </div>
+
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <svg fill="white" viewBox="0 0 24 24">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                </svg>
+                <h3>Belum ada spreadsheet</h3>
+                <p>Klik tombol + untuk menambahkan spreadsheet baru</p>
+            </div>
+        </div>
+
+        <button class="add-button" onclick="openModal()">+</button>
+
+        <div class="modal" id="modal">
+            <div class="modal-content">
+                <h2>Tambah Spreadsheet Baru</h2>
+                <form id="addForm">
+                    <div class="form-group">
+                        <label>Nama Guru</label>
+                        <input type="text" id="teacherName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mata Pelajaran</label>
+                        <input type="text" id="subject" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Kelas</label>
+                        <input type="text" id="className" placeholder="Contoh: 7A, 8B" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Link Spreadsheet</label>
+                        <input type="url" id="spreadsheetUrl" placeholder="https://docs.google.com/spreadsheets/..." required>
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="button" class="btn-cancel" onclick="closeModal()">Batal</button>
+                        <button type="submit" class="btn-save">Simpan</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
     <script>
+        // Data guru dengan username dan password
+        let teachers = [
+            {
+                username: "mualimah",
+                password: "mualimah123",
+                name: "Ibu Mualimah",
+                classes: ["1"]
+            },
+            {
+                username: "dafa",
+                password: "dafa123",
+                name: "Bapak Dafa",
+                classes: ["2"]
+            },
+            {
+                username: "desi",
+                password: "desi123",
+                name: "Ibu Desi",
+                classes: ["3A"]
+            },
+            {
+                username: "uun",
+                password: "uun123",
+                name: "Ibu uun",
+                classes: ["1", "2"]
+            }
+        ];
+
         let spreadsheets = [
             {
                 id: 1,
-                teacher: "Ibu Siti Nurhaliza",
-                subject: "Matematika",
-                class: "7A",
+                teacher: "Ibu Mualimah",
+                subject: "Guru Kelas 1",
+                class: "1",
                 url: "https://docs.google.com/spreadsheets/d/1example1"
             },
             {
                 id: 2,
-                teacher: "Bapak Ahmad Wijaya",
-                subject: "Bahasa Indonesia",
-                class: "7B",
+                teacher: "Bapak Dafa",
+                subject: "Guru Kelas 2",
+                class: "",
                 url: "https://docs.google.com/spreadsheets/d/1example2"
             },
             {
                 id: 3,
-                teacher: "Ibu Rina Susanti",
-                subject: "IPA",
-                class: "8A",
+                teacher: "Ibu Desi",
+                subject: "Guru Kelas 3A",
+                class: "3A",
+                url: "https://docs.google.com/spreadsheets/d/1example3"
+            },
+            {
+                id: 4,
+                teacher: "Ibu Uun",
+                subject: "Guru Agama",
+                class: "1 dan 2",
                 url: "https://docs.google.com/spreadsheets/d/1example3"
             }
         ];
+
+        // Session management
+        let currentUser = null;
+
+        function checkSession() {
+            const savedSession = sessionStorage.getItem('teacherSession');
+            if (savedSession) {
+                currentUser = JSON.parse(savedSession);
+                showDashboard();
+            } else {
+                showLogin();
+            }
+        }
+
+        function showLogin() {
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+        }
+
+        function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('welcomeText').textContent = `Selamat datang, ${currentUser.name}`;
+            renderSpreadsheets();
+        }
+
+        function login(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            const teacher = teachers.find(t => t.username === username && t.password === password);
+            
+            if (teacher) {
+                currentUser = teacher;
+                sessionStorage.setItem('teacherSession', JSON.stringify(teacher));
+                showDashboard();
+                document.getElementById('loginForm').reset();
+                document.getElementById('loginError').classList.remove('active');
+            } else {
+                document.getElementById('loginError').classList.add('active');
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('teacherSession');
+            currentUser = null;
+            showLogin();
+        }
 
         function renderSpreadsheets(filter = '') {
             const grid = document.getElementById('spreadsheetGrid');
             const emptyState = document.getElementById('emptyState');
             
-            const filtered = spreadsheets.filter(s => 
+            // Filter spreadsheet berdasarkan kelas yang diajar guru
+            const userSpreadsheets = spreadsheets.filter(s => 
+                currentUser.classes.includes(s.class)
+            );
+            
+            const filtered = userSpreadsheets.filter(s => 
                 s.teacher.toLowerCase().includes(filter.toLowerCase()) ||
                 s.subject.toLowerCase().includes(filter.toLowerCase()) ||
                 s.class.toLowerCase().includes(filter.toLowerCase())
@@ -428,6 +647,8 @@
 
         function openModal() {
             document.getElementById('modal').classList.add('active');
+            // Auto-fill nama guru yang sedang login
+            document.getElementById('teacherName').value = currentUser.name;
         }
 
         function closeModal() {
@@ -442,11 +663,19 @@
         document.getElementById('addForm').addEventListener('submit', (e) => {
             e.preventDefault();
             
+            const className = document.getElementById('className').value;
+            
+            // Validasi: hanya bisa menambah spreadsheet untuk kelas yang diajar
+            if (!currentUser.classes.includes(className)) {
+                alert(`Anda hanya bisa menambahkan spreadsheet untuk kelas: ${currentUser.classes.join(', ')}`);
+                return;
+            }
+            
             const newSpreadsheet = {
                 id: Date.now(),
                 teacher: document.getElementById('teacherName').value,
                 subject: document.getElementById('subject').value,
-                class: document.getElementById('className').value,
+                class: className,
                 url: document.getElementById('spreadsheetUrl').value
             };
 
@@ -461,7 +690,10 @@
             }
         });
 
-        renderSpreadsheets();
+        document.getElementById('loginForm').addEventListener('submit', login);
+
+        // Check session saat halaman dimuat
+        checkSession();
     </script>
 </body>
 </html>
